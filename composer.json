@@ -1,16 +1,21 @@
 {
-    "name": "wongzx/lac",
-    "description": "All things",
-    "type": "library",
-    "license": "MIT",
-    "authors": [
-	    {
-	      "name": "wongzx",
-	      "email": "hzxwong@163.com"
-	    }
-	 ],
-    "minimum-stability": "dev",
-    "require": {
-    	"php": ">=7.0.0"
+  "name": "wongzx/lac",
+  "description": "All things",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "wongzx",
+      "email": "hzxwong@163.com"
     }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=7.0.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Lac\\": "src"
+    }
+  }
 }
