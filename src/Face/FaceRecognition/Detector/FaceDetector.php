@@ -8,8 +8,21 @@
 
 namespace Lac\Face\FaceRecognition\Detector;
 
+use CV\CascadeClassifier;
+use CV\Size;
+use CV\Mat;
+use CV\Point;
+use CV\Scalar;
+use function CV\{
+    normalize, imread, cvtColor, equalizeHist, rectangleByRect, imshow, waitKey, putText, imwrite, resize
+};
+use const CV\{
+    NORM_MINMAX, CV_8UC1, CV_8UC3, IMREAD_GRAYSCALE, COLOR_BGR2GRAY, CV_HAAR_SCALE_IMAGE
+};
+
 use Lac\Face\TigerBalm;
 use Exception;
+use function PHPSTORM_META\type;
 
 class FaceDetector
 {
@@ -25,21 +38,55 @@ class FaceDetector
 
     private $height;
 
-    private $foundRects;
+    private $foundRects = [];
 
     public function __construct()
     {
-        $this->initClassifier('./haarcascade_frontalface_default.xml');
+//        $this->initClassifier('./data/lbpcascades/lbpcascade_frontalface.xml');
     }
 
     /**
+     * facedetect + opencv
      * 扫描检测人脸
      * @author  Wong <[842687571@qq.com]>
      * @param string $
      * @created on 2018/12/28 11:47 AM
      * @copyright Copyright (c)
      */
-    public function FaceScan(string $imageFile)
+    public function FaceScan($frame = '')
+    {
+        if ($frame == '') {
+            $frame = imread($frame);
+        }
+        $cascadeClassifier = new CascadeClassifier();
+        $cascadeClassifier->load('./models/haarcascades/haarcascade_frontalface_alt2.xml');
+
+        $gray = cvtColor($frame, COLOR_BGR2GRAY);//转为灰度图
+        equalizeHist($gray, $gray);
+
+        $faces = null;
+        $cascadeClassifier->detectMultiScale($gray, $faces, 1.1, 2, CV_HAAR_SCALE_IMAGE, new Size(50, 50));
+
+        $face = null;
+        for ($i = 0; $i < count($faces); $i++) {
+            if ($faces[$i]->height > 0 && $faces[$i]->width > 0) {
+//                $face = $gray->getImageROI($faces[$i]);
+                $textLb = new Point($faces[$i]->x, $faces[$i]->y - 10);
+                rectangleByRect($frame, $faces[$i], new Scalar(255, 0, 0), 1, 8, 0);
+                putText($frame, 'zhixue', $textLb, 3, 1, new Scalar(0, 0, 255));
+            }
+        }
+        return $frame;
+    }
+
+    /**
+     * 扫描检测人脸废弃
+     * @author  Wong <[842687571@qq.com]>
+     * @param string $
+     * @created on 2018/12/28 11:47 AM
+     * @copyright Copyright (c)
+     */
+    public function FaceScanDiscard(string $imageFile)
     {
         $imageInfo = getimagesize($imageFile);
 
@@ -113,7 +160,7 @@ class FaceDetector
      * @created on 2018/12/28 4:01 PM
      * @copyright Copyright (c)
      */
-    public function getImage($fileName = null, $moreConfidence = false, $showAllRects = false)
+    public function getImage($fileName = null, $moreConfidence = false, $showAllRects = true)
     {
         //创建一个画布
         $canvas = imagecreatetruecolor($this->width, $this->height);
@@ -133,20 +180,20 @@ class FaceDetector
         if ($showAllRects) {
             //矩形 x y w h
             foreach ($this->foundRects as $r) {
-                imagerectangle($canvas, $r['x'], $r['y'], $r['x'] + $r['width'], $r['y'] + $r['height'], $blue);
+                imagerectangle($canvas, $r['x'], $r['y'], $r['x'] + $r['w'], $r['y'] + $r['h'], $blue);
             }
         }
 
-        $rects = $this->faceMerge($this->foundRects, 2 + intval($moreConfidence));
-        foreach ($rects as $r) {
-            imagerectangle($canvas, $r['x'], $r['y'], $r['x'] + $r['width'], $r['y'] + $r['height'], $red);
-        }
+//        $rects = $this->faceMerge($this->foundRects, 2 + intval($moreConfidence));
+//        foreach ($rects as $r) {
+//            imagerectangle($canvas, $r['x'], $r['y'], $r['x'] + $r['width'], $r['y'] + $r['height'], $red);
+//        }
 
         ob_start();
         imagepng($canvas);
         $fileContent = ob_get_contents();
         ob_end_clean();
-        return (base64_encode($fileContent));
+        return ('data:image/png;base64,' . base64_encode($fileContent));
 
 
     }

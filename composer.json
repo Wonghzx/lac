@@ -17,5 +17,7 @@
     "psr-4": {
       "Lac\\": "src"
     }
+  },
+  "require-dev": {
   }
 }

@@ -9,12 +9,17 @@
 namespace Lac\Face;
 
 use Lac\Face\FaceRecognition\Detector\FaceDetector;
+use Lac\Face\FaceRecognition\VideoCapture\VideoCapture;
 
 class FaceQuery
 {
-    public function __construct()
+    public function test()
     {
-        $s = FaceDetector::getInstance()->FaceScan('./005EneYkly1fosvje9oc4j30gl0hctn9.jpg')->getImage();
+        $imgName = './xxxx.jpg';
+
+//        $s = FaceDetector::getInstance()->FaceScan($imgName);//->getImage();
+        VideoCapture::getInstance();
+//        echo "<img src='{$s}'>";
 
     }
 }
