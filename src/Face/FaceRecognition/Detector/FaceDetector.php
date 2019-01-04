@@ -55,7 +55,8 @@ class FaceDetector
      */
     public function FaceScan($frame = '')
     {
-        if ($frame == '') {
+        if (!is_object($frame)) {
+            $is_f = true;
             $frame = imread($frame);
         }
         $cascadeClassifier = new CascadeClassifier();
@@ -76,7 +77,13 @@ class FaceDetector
                 putText($frame, 'zhixue', $textLb, 3, 1, new Scalar(0, 0, 255));
             }
         }
-        return $frame;
+        if ($is_f) {
+            imshow('test',$frame);
+            waitKey(0);
+        } else {
+            return $frame;
+
+        }
     }
 
     /**
